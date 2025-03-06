@@ -1,13 +1,14 @@
 import React from "react";
-import Background from "./components/background";
-import "./App.css"; // Si tu as un fichier CSS global
+import Background from "./components/Background";
+import Wheel from "./components/RotateWheel";
+import "./App.css";
 
 const App = () => {
     return (
-    <div className="App">
-        <Background />
-      {/* Ton contenu ici */}
-    </div>
+        <div className="App">
+            <Background />
+            <Wheel />
+        </div>
     );
 };
 
