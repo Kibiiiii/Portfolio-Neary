@@ -12,14 +12,17 @@ const segments = [
 const Wheel = () => {
     const [rotation, setRotation] = useState(0);
     const [outerRotation, setOuterRotation] = useState(0);
+    const [lightRotation, setLightRotation] = useState(0);
     const [isRotating, setIsRotating] = useState(true);
+    const [selectedSegment, setSelectedSegment] = useState(null);
 
     useEffect(() => {
         let interval;
         if (isRotating) {
             interval = setInterval(() => {
-                setRotation((prev) => prev + 1);
-                setOuterRotation((prev) => prev - 1); // Rotation inverse pour le cercle extérieur
+                setRotation((prev) => prev + 0.2); // Roue principale plus lente
+                setOuterRotation((prev) => prev - 0.2); // Cercle extérieur en contre-sens
+                setLightRotation((prev) => prev - 0.2); // Inverser la rotation des points lumineux
             }, 50);
         }
         return () => clearInterval(interval);
@@ -31,9 +34,22 @@ const Wheel = () => {
             onMouseEnter={() => setIsRotating(false)} 
             onMouseLeave={() => setIsRotating(true)}
         >
-            <div className="outermost-circle-container">
-                <div className="outermost-circle" style={{ transform: `rotate(${outerRotation}deg)` }}></div>
+            {/* Cercle extérieur qui tourne */}
+            <div className="outermost-circle" style={{ transform: `rotate(${outerRotation}deg)` }}>
+                <div className="rotating-lights" style={{ transform: `rotate(${lightRotation}deg)` }}>
+                    {[...Array(8)].map((_, i) => (
+                        <div 
+                            key={i} 
+                            className="light-point" 
+                            style={{ 
+                                transform: `rotate(${i * 45}deg) translate(210px) translateY(-5px)`, // Centrage précis
+                            }} 
+                        />
+                    ))}
+                </div>
             </div>
+            
+            {/* Cercle contenant les segments */}
             <div className="outer-circle" style={{ transform: `rotate(${rotation}deg)` }}>
                 <svg width="400" height="400" viewBox="0 0 400 400" className="wheel-svg">
                     <defs>
@@ -52,7 +68,7 @@ const Wheel = () => {
                         ))}
                     </defs>
                     {segments.map((segment, index) => (
-                        <text key={index} fill="white" fontSize="16" fontWeight="bold">
+                        <text key={index} fill="white" fontSize="16" fontWeight="bold" onClick={() => setSelectedSegment(segment.label)} style={{ cursor: 'pointer' }}>
                             <textPath 
                                 href={`#arc${index}`} 
                                 startOffset="50%" 
@@ -65,7 +81,13 @@ const Wheel = () => {
                     ))}
                 </svg>
             </div>
-            <div className="middle-circle"></div>
+            
+            {/* Affichage du segment sélectionné */}
+            {selectedSegment && (
+                <div className="selected-segment">{selectedSegment}</div>
+            )}
+            
+            {/* Cercles internes */}
             <div className="inner-circle"></div>
             <div className="wheel" style={{ transform: `rotate(${rotation}deg)` }}></div>
         </div>
