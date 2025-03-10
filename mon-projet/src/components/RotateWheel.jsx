@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "../style/rotatewheel.css";
 
 const segments = [
-    { label: "À propos", deg: 0 },
-    { label: "CV", deg: 72 },
-    { label: "Compétences", deg: 144 },
-    { label: "Projets", deg: 216 },
-    { label: "Contact", deg: 288 },
+    { label: "À propos", path: "/a-propos", deg: 0 },
+    { label: "CV", path: "/cv", deg: 72 },
+    { label: "Compétences", path: "/competences", deg: 144 },
+    { label: "Projets", path: "/projets", deg: 216 },
+    { label: "Contact", path: "/contact", deg: 288 },
 ];
 
 const Wheel = () => {
@@ -14,19 +15,24 @@ const Wheel = () => {
     const [outerRotation, setOuterRotation] = useState(0);
     const [lightRotation, setLightRotation] = useState(0);
     const [isRotating, setIsRotating] = useState(true);
-    const [selectedSegment, setSelectedSegment] = useState(null);
+
+    const navigate = useNavigate(); // Utilisation de useNavigate
 
     useEffect(() => {
         let interval;
         if (isRotating) {
             interval = setInterval(() => {
-                setRotation((prev) => prev + 0.2); // Roue principale plus lente
-                setOuterRotation((prev) => prev - 0.2); // Cercle extérieur en contre-sens
-                setLightRotation((prev) => prev - 0.2); // Inverser la rotation des points lumineux
+                setRotation((prev) => prev + 0.2);
+                setOuterRotation((prev) => prev - 0.2);
+                setLightRotation((prev) => prev - 0.2);
             }, 50);
         }
         return () => clearInterval(interval);
     }, [isRotating]);
+
+    const handleClick = (path) => {
+        navigate(path); // Redirection vers la route cliquée
+    };
 
     return (
         <div 
@@ -42,13 +48,13 @@ const Wheel = () => {
                             key={i} 
                             className="light-point" 
                             style={{ 
-                                transform: `rotate(${i * 45}deg) translate(210px) translateY(-5px)`, // Centrage précis
+                                transform: `rotate(${i * 45}deg) translate(210px) translateY(-5px)`,
                             }} 
                         />
                     ))}
                 </div>
             </div>
-            
+
             {/* Cercle contenant les segments */}
             <div className="outer-circle" style={{ transform: `rotate(${rotation}deg)` }}>
                 <svg width="400" height="400" viewBox="0 0 400 400" className="wheel-svg">
@@ -68,7 +74,14 @@ const Wheel = () => {
                         ))}
                     </defs>
                     {segments.map((segment, index) => (
-                        <text key={index} fill="white" fontSize="16" fontWeight="bold" onClick={() => setSelectedSegment(segment.label)} style={{ cursor: 'pointer' }}>
+                        <text 
+                            key={index} 
+                            fill="white" 
+                            fontSize="16" 
+                            fontWeight="bold" 
+                            onClick={() => handleClick(segment.path)} 
+                            style={{ cursor: 'pointer' }}
+                        >
                             <textPath 
                                 href={`#arc${index}`} 
                                 startOffset="50%" 
@@ -81,12 +94,7 @@ const Wheel = () => {
                     ))}
                 </svg>
             </div>
-            
-            {/* Affichage du segment sélectionné */}
-            {selectedSegment && (
-                <div className="selected-segment">{selectedSegment}</div>
-            )}
-            
+
             {/* Cercles internes */}
             <div className="inner-circle"></div>
             <div className="wheel" style={{ transform: `rotate(${rotation}deg)` }}></div>
@@ -95,3 +103,4 @@ const Wheel = () => {
 };
 
 export default Wheel;
+
